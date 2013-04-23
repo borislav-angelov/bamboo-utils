@@ -23,7 +23,9 @@ post '/build-plan/:key' do |key|
 
       pull_request = data['pull_request'][]
       if pull_request['id'] and pull_request['head']
-        puts @github_client.create_status(pull_request['id'], pull_request['head']['sha'], :pending)
+        puts pull_request['id'], pull_request['head']['sha']
+
+        #puts @github_client.create_status(pull_request['id'], pull_request['head']['sha'], :pending)
 
       end
 
