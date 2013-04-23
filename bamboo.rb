@@ -32,7 +32,7 @@ post '/build-plan/:key' do |key|
     	# Run build-plan
     	# Update status for completed
 
-      "OK"
+      puts "OK"
     else
       "This plan is not enabled in Bamboo database"
     end
