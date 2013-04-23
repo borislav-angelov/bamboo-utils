@@ -24,7 +24,7 @@ post '/build-plan/:key' do |key|
       repository = data['repository']
       pull_request = data['pull_request']
       if repository['full_name'] and pull_request['head']
-        @github_client.create_status(repository['full_name'], pull_request['head']['sha'], 'pending', {'description' => 'Build #1234 started'})
+        @github_client.create_status(repository['full_name'], pull_request['head']['sha'], 'pending', {:description => 'Build #1234 started'})
       end
 
       #
