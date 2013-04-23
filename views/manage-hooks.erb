@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Manage GitHub Hook</title>
+<style type="text/css">
+body {
+	font-family: Arial, Verdana, sans-serif;
+	font-size: 12px;
+}
+
+#wrapper {
+	width: 600px;
+}
+
+h1 {
+	margin: 0;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+h2 {
+	margin: 20px 0 8px 0;
+	font-size: 14px;
+	font-weight: bold;
+	color: #777;
+}
+
+input[type="text"] {
+	width: 240px;
+}
+
+p.message {
+	color: #0066FF;
+}
+
+div.hook-list-info {
+	float: left;
+	width: 400px;
+}
+
+div.hook-list-actions {
+	float: left;
+}
+
+.clear {
+	clear: both;
+}
+
+ul {
+	list-style: none;
+	margin: 10px 0 0 0;
+	padding: 0;
+	float: left;
+	border-top: 1px dotted #ccc;
+	border-left: 1px dotted #ccc;
+	border-right: 1px dotted #ccc;
+}
+
+ul li {
+	padding: 8px;
+	border-bottom: 1px dotted #ccc;
+}
+
+dl {
+	margin: 0;
+	padding: 0;
+}
+
+dl dt {
+	margin: 0 0 4px 0;
+	padding: 0;
+}
+
+dl dd {
+	margin: 0 0 10px 0;
+	padding: 0;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="wrapper">
+
+	<h1>Manage GitHub Hooks</h1>
+
+	<% if @message %>
+		<p class="message"><%= @message %></p>
+	<% end %>
+
+	<h2>List available hooks for specific repository</h2>
+	<form action="" method="get">
+		<input type="text" name="repo_name" placeholder="Enter repo name" />
+		<button type="submit">Get Hooks</button>
+	</form>
+
+	<% if @hooks %>
+		<ul>
+		  <% for @item in @hooks %>
+		  	<form action="/manage-hooks" method="post">
+				<input type="hidden" name="repo_name" value="<%= @repo_name %>" />
+				<input type="hidden" name="hook_id" value="<%= @item['id'] %>" />
+
+				<li>
+					<div class="hook-list-info">
+						<strong>Hook Name:</strong> <%= @item['name'] %><br />
+						<strong>Hook Events:</strong> <%= @item['events'].join(', ') %><br />
+						<strong>Hook URL:</strong> <%= @item['config']['url'] %><br />
+						<strong>Active:</strong> <%= @item['active'] %>
+					</div>
+
+					<div class="hook-list-actions">
+						<button type="submit">Test</button>
+						<button type="submit" name="_method" value="delete">Remove</button>
+					</div>
+
+					<div class="clear"></div>
+				</li>
+			</form>
+		  <% end %>
+		</ul>
+
+		<div class="clear"></div>
+	<% end %>
+
+	<h2>Add Hook</h2>
+	<form action="" method="post">
+		<dl>
+			<dt>Repository Name</dt>
+			<dd><input type="text" name="repo_name" placeholder="Enter repo name" /></dd>
+
+			<dt>Hook Events (comma separated)</dt>
+			<dd><input type="text" name="hook_events" placeholder="Enter hook events " value="push,pull_request" /></dd>
+
+			<dt>Hook URL</dt>
+			<dd>
+				<input type="text" name="hook_url" placeholder="Enter hook URL" />
+				<button type="submit">Add Hook</button>
+			</dd>
+		</dl>
+	</form>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+bamboo:
+  url: http://ci.time.ly:8085/
+  username:
+  password:
+github:
+  url: https://api.github.com/
+  username:
+  token:
+  password:
