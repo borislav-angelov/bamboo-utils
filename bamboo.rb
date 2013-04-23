@@ -21,6 +21,13 @@ post '/build-plan/:key' do |key|
   		data = JSON.parse(request.body.read)
   		puts data
 
+      pull_request = data['pull_request'][]
+      if pull_request['id'] and pull_request['head']
+        puts @github_client.create_status(pull_request['id'], pull_request['head']['sha'], :pending)
+
+      end
+
+      #
     	# Update Status
     	# Run build-plan
     	# Update status for completed
