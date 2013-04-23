@@ -27,11 +27,12 @@ post '/build-plan/:key' do |key|
         @github_client.create_status(repository['full_name'], pull_request['head']['sha'], 'pending', {:description => 'Build #1234 started'})
       end
 
-      puts "OK"
       #
     	# Update Status
     	# Run build-plan
     	# Update status for completed
+
+      "OK"
     else
       "This plan is not enabled in Bamboo database"
     end
