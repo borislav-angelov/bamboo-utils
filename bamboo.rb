@@ -17,16 +17,14 @@ post '/build-plan/:key' do |key|
 
     plan = bamboo_client.plan_for(key)
     if plan.enabled?
-
+      # GitHub JSON Request
   		data = JSON.parse(request.body.read)
-  		puts data
 
-      pull_request = data['pull_request'][]
-      if pull_request['id'] and pull_request['head']
-        puts pull_request['id'], pull_request['head']['sha']
-
-        #puts @github_client.create_status(pull_request['id'], pull_request['head']['sha'], :pending)
-
+      # Set status and run build
+      repository = data['repository']
+      pull_request = data['pull_request']
+      if repository['full_name'] and pull_request['head']
+        @github_client.create_status(repository['name'], pull_request['head']['sha'], 'pending', {'description' => 'Build #1234 started'})
       end
 
       #
