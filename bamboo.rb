@@ -24,7 +24,6 @@ post '/build-plan/:key' do |key|
     	# Update Status
     	# Run build-plan
     	# Update status for completed
-      "Vsichko e po plan"
     else
       "This plan is not enabled in Bamboo database"
     end
@@ -42,8 +41,6 @@ get '/manage-hooks' do
   if @repo_name
     begin
   	  @hooks = @github_client.hooks(@repo_name)
-
-  	  puts @hooks
     rescue Octokit::NotFound
   	  @message = "This repository is not found in GitHub (example: borislav-angelov/bamboo-pull-requests)"
   	end
