@@ -1,9 +1,17 @@
 require 'bamboo-client'
 
-class Bamboo::Client::Rest::Plan
+module Bamboo
+  module Client
 
-  def queue(params)
-    @http.post File.join(SERVICE, "queue/#{URI.escape key}"), params, @http.cookies
+    class Rest
+      class Plan
+
+        def queue_params(params)
+          @http.post File.join(SERVICE, "queue/#{URI.escape key}"), params, @http.cookies
+        end
+
+      end
+    end
+
   end
-
 end
