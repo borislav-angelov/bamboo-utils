@@ -7,7 +7,8 @@ module Bamboo
       class Plan
 
         def queue
-          @http.post File.join(SERVICE, "queue/#{URI.escape key}?repositoryFullName=spookysv/bamboo-pull-requests"), {}, @http.cookies
+          data = "repositoryFullName=spookysv/bamboo-pull-requests"
+          @http.post File.join(SERVICE, "queue/#{URI.escape key}"), data, @http.cookies
         end
 
       end
