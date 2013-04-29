@@ -71,11 +71,12 @@ post '/manage-hooks' do
   hook_id = params[:hook_id]
 
   if repo_name and hook_id
+
   	@github_client.test_hook(repo_name, hook_id)
 
-  	redirect '/manage-hooks?repo_name=' + repo_name
   elsif repo_name and hook_events and hook_url
-	@github_client.create_hook(repo_name, 'web', {
+
+	  @github_client.create_hook(repo_name, 'web', {
       :url => hook_url,
       :content_type => 'json'
   	}, {
@@ -83,8 +84,9 @@ post '/manage-hooks' do
       :active => true
     })
 
-	@message = "This event hook is added successfully. You can check it in the list section."
   end
+
+  redirect '/manage-hooks?repo_name=' + repo_name
 
   erb :'manage-hooks'
 end
