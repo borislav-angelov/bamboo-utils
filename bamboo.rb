@@ -3,7 +3,7 @@ require 'sinatra/config_file'
 require 'bamboo-client'
 require 'octokit'
 require 'json'
-require 'patch'
+require './patch.rb'
 
 
 config_file 'config.yml'
