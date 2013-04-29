@@ -6,7 +6,7 @@ module Bamboo
     class Rest
       class Plan
 
-        def queue_params(params)
+        def queue(params)
           @http.post File.join(SERVICE, "queue/#{URI.escape key}"), params, @http.cookies
         end
 
