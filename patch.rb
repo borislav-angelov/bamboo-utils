@@ -1,4 +1,20 @@
-require 'bamboo-client'
+
+module Bamboo
+  module Client
+    module Http
+
+      class Json < Abstract
+
+        def post(uri_or_path, data = {}, cookies = nil, query = nil)
+          resp = RestClient.post(uri_for(uri_or_path, query), data.to_json, :accept => :json, :content_type => :json, :cookies => cookies)
+          Doc.from(resp) unless resp.empty?
+        end
+
+      end # Json
+
+    end # Http
+  end # Client
+end # Bamboo
 
 module Bamboo
   module Client
@@ -6,13 +22,12 @@ module Bamboo
     class Rest
       class Plan
 
-        def queue
-          data = "repositoryFullName=spookysv/bamboo-pull-requests"
-          @http.post File.join(SERVICE, "queue/#{URI.escape key}"), data, @http.cookies
+        def queue(query = nil)
+          @http.post File.join(SERVICE, "queue/#{URI.escape key}"), data, @http.cookies, query
         end
 
-      end
-    end
+      end # Rest
+    end # Plan
 
-  end
-end
+  end # client
+end # Bamboo
