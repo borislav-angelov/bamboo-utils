@@ -3,6 +3,8 @@ require 'sinatra/config_file'
 require 'bamboo-client'
 require 'octokit'
 require 'json'
+require 'patch'
+
 
 config_file 'config.yml'
 
@@ -17,14 +19,18 @@ post '/build-plan/:key' do |key|
 
     plan = bamboo_client.plan_for(key)
     if plan.enabled?
+
       # GitHub JSON Request
   		data = JSON.parse(request.body.read)
 
-      # Set status and run build
-      repository = data['repository']
+      # Get Pull Request Parameters
       pull_request = data['pull_request']
-      if repository['full_name'] and pull_request['head']
-        @github_client.create_status(repository['full_name'], pull_request['head']['sha'], 'pending', {:description => 'Build #1234 started'})
+      if pull_request['head']
+
+        plan.queue({:repositoryFullName => pull_request['head']['full_name']})
+
+
+        #@github_client.create_status(repository['full_name'], pull_request['head']['sha'], 'pending', {:description => 'Build #1234 started'})
       end
 
       #
