@@ -23,7 +23,7 @@ module Bamboo
       class Plan
 
         def queue(query = nil)
-          @http.post File.join(SERVICE, "queue/#{URI.escape key}"), data, @http.cookies, query
+          @http.post File.join(SERVICE, "queue/#{URI.escape key}"), {}, @http.cookies, query
         end
 
       end # Rest
