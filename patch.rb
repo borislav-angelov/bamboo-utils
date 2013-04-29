@@ -6,10 +6,8 @@ module Bamboo
     class Rest
       class Plan
 
-        def queue(params)
-          key = key + "?repositoryFullName=spookysv/bamboo-pull-requests"
-          puts key
-          @http.post File.join(SERVICE, "queue/#{URI.escape key}"), params, @http.cookies
+        def queue
+          @http.post File.join(SERVICE, "queue/#{URI.escape key}?repositoryFullName=spookysv/bamboo-pull-requests"), {}, @http.cookies
         end
 
       end
