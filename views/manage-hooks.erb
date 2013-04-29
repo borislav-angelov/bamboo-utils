@@ -26,7 +26,7 @@ h2 {
 }
 
 input[type="text"] {
-	width: 240px;
+	width: 280px;
 }
 
 p.message {
@@ -91,7 +91,7 @@ dl dd {
 
 	<h2>List available hooks for specific repository</h2>
 	<form action="" method="get">
-		<input type="text" name="repo_name" placeholder="Enter repo name" />
+		<input type="text" name="repo_name" placeholder="Enter repository full name" />
 		<button type="submit">Get Hooks</button>
 	</form>
 
@@ -128,14 +128,14 @@ dl dd {
 	<form action="" method="post">
 		<dl>
 			<dt>Repository Name</dt>
-			<dd><input type="text" name="repo_name" placeholder="Enter repo name" /></dd>
+			<dd><input type="text" name="repo_name" placeholder="Enter repository full name" /></dd>
 
 			<dt>Hook Events (comma separated)</dt>
 			<dd><input type="text" name="hook_events" placeholder="Enter hook events " value="push,pull_request" /></dd>
 
 			<dt>Hook URL</dt>
 			<dd>
-				<input type="text" name="hook_url" placeholder="Enter hook URL" />
+				<input type="text" name="hook_url" placeholder="Enter hook absolute URL" />
 				<button type="submit">Add Hook</button>
 			</dd>
 		</dl>
