@@ -31,19 +31,13 @@ post '/build-plan/:key' do |key|
         repository_full_name = pull_request['head']['repo']['full_name']
 
         # Trigger Build
-        build_result = plan.queue({:'bamboo.variable.repositoryFullName' => repository_full_name})
+        build_result = plan.queue({
+          :'bamboo.variable.repositoryFullName' => repository_full_name,
+          :'bamboo.variable.sha' => pull_request['head']['sha'],
+        })
 
-        # Update Status
-        @github_client.create_status(repository_full_name, pull_request['head']['sha'], 'pending',
-          {:description => "Build \##{build_result.data['buildNumber']} started"})
+        puts "Build \##{build_result.data['buildNumber']} triggered"
       end
-
-      #
-    	# Update Status
-    	# Run build-plan
-    	# Update status for completed
-
-      puts "OK"
     else
       "This plan is not enabled in Bamboo database"
     end
@@ -106,10 +100,23 @@ delete '/manage-hooks' do
 end
 
 post '/update-status' do
+  build_number = params[:build_number]
   repo_name = params[:repo_name]
+  sha = params[:sha]
   status = params[:status]
 
-  puts repo_name
-  puts status
+  # Update Status
+  message = nil
+  if status == "pending"
+    message = "Build \##{build_number} started..."
+  elsif status == "success"
+    message = "Build \##{build_number} succeeded."
+  else
+    message = "Build \##{build_number} failed!"
+  end
+
+  @github_client.create_status(repository_full_name, sha, status, {:description => message})
+
+  puts "Build \##{build_number} status updated"
 end
 
