@@ -25,7 +25,7 @@ post '/build-plan/:key' do |key|
 
       # Get Pull Request Parameters
       pull_request = data['pull_request']
-      if pull_request['head']
+      if pull_request and pull_request['head']
 
         plan.queue({:'bamboo.variable.repositoryFullName' => pull_request['head']['repo']['full_name']})
 
