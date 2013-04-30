@@ -115,7 +115,7 @@ post '/update-status' do
     message = "Build \##{build_number} failed!"
   end
 
-  @github_client.create_status(repository_full_name, sha, status, {:description => message})
+  @github_client.create_status(repo_name, sha, status, {:description => message})
 
   puts "Build \##{build_number} status updated"
 end
