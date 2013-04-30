@@ -103,13 +103,13 @@ delete '/manage-hooks' do
 
 	  redirect '/manage-hooks?repo_name=' + repo_name
 	end
+end
 
-  post '/update-status' do
-    repo_name = params[:repo_name]
-    status = params[:status]
+post '/update-status' do
+  repo_name = params[:repo_name]
+  status = params[:status]
 
-    puts repo_name
-    puts status
-  end
+  puts repo_name
+  puts status
 end
 
