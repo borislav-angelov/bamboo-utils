@@ -27,15 +27,15 @@ post '/build-plan/:key' do |key|
       pull_request = data['pull_request']
       if pull_request and pull_request['head']
 
+        # Set Repository Full Name
         repository_full_name = pull_request['head']['repo']['full_name']
 
         # Trigger Build
         build_result = plan.queue({:'bamboo.variable.repositoryFullName' => repository_full_name})
 
-        puts build_result.inspect
-
         # Update Status
-        @github_client.create_status(repository_full_name, pull_request['head']['sha'], 'pending', {:description => 'Build #1234 started'})
+        @github_client.create_status(repository_full_name, pull_request['head']['sha'], 'pending',
+          {:description => "Build \##{build_result.data['buildNumber']} started"})
       end
 
       #
