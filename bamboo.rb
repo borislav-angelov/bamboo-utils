@@ -54,6 +54,7 @@ end
 get '/build-plan-status/:key' do |key|
   begin
     plan = @bamboo_client.plan_for(key)
+    puts plan
     if plan.enabled?
 
       # Get build status
