@@ -7,4 +7,4 @@ This application includes the following functionalities:
 3. To be implemented ?
 
 Based on:
-Ruby + Sinatra Application
+Ruby 1.9.3 + Sinatra Framework
