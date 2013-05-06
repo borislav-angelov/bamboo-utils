@@ -5,19 +5,24 @@ require 'octokit'
 require 'json'
 require './patch.rb'
 
-
 config_file 'config.yml'
 
 before do
+  # Bamboo Client
+  begin
+    @bamboo_client = Bamboo::Client.for(:rest, settings.bamboo['url'])
+    @bamboo_client.login(settings.bamboo['username'], settings.bamboo['password'])
+  rescue SocketError
+    "Wrong Bamboo URL Address! Please check your configuration file."
+  end
+
+  # Github Client
 	@github_client = Octokit::Client.new(:login => settings.github['username'], :oauth_token => settings.github['token'])
 end
 
 post '/build-plan/:key' do |key|
   begin
-    bamboo_client = Bamboo::Client.for(:rest, settings.bamboo['url'])
-    bamboo_client.login(settings.bamboo['username'], settings.bamboo['password'])
-
-    plan = bamboo_client.plan_for(key)
+    plan = @bamboo_client.plan_for(key)
     if plan.enabled?
 
       # GitHub JSON Request
@@ -41,11 +46,24 @@ post '/build-plan/:key' do |key|
     else
       "This plan is not enabled in Bamboo database"
     end
-
   rescue RestClient::ResourceNotFound
   	"This plan does not exist in Bamboo database"
-  rescue SocketError
-  	"Wrong Bamboo URL Address! Please check your configuration file."
+  end
+end
+
+get '/build-plan-status/:key' do |key|
+  begin
+    plan = @bamboo_client.plan_for(key)
+    if plan.enabled?
+
+      # Get build status
+      puts plan.results
+
+    else
+      "This plan is not enabled in Bamboo database"
+    end
+  rescue RestClient::ResourceNotFound
+    "This plan does not exist in Bamboo database"
   end
 end
 
