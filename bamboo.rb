@@ -57,7 +57,9 @@ get '/build-plan-status/:key' do |key|
     if plan.enabled?
 
       # Get build status
-      puts plan.latest_results
+      plan_results = plan.results
+
+      puts plan_results.first
 
     else
       "This plan is not enabled in Bamboo database"
