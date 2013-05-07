@@ -60,7 +60,7 @@ get '/build-plan-status/:key' do |key|
       plan_results = plan.results
       if plan_results
         latest = plan_results.first
-
+puts latest.inspect
         build_state = latest.data['plan']['state']
         if build_state == "Successful"
           build_state_image = "passing.png"
