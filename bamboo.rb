@@ -61,16 +61,13 @@ get '/build-plan-status/:key' do |key|
       if plan_results
         latest = plan_results.first
         if latest.successful?
-          build_state_image = "passing.png"
+          build_state_image = "images/passing.png"
         else
-          build_state_image = "failing.png"
+          build_state_image = "images/failing.png"
         end
 
-        puts build_state_image
-        # STREAM IMAGE
-        #img = Magick::Image.read('logo:')[0]
-        #img.format = 'png'
-        #img.to_blob
+        content_type "image/png"
+        return open(build_state_image, "rb") {|io| io.read }
       end
 
     else
