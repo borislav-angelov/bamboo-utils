@@ -133,6 +133,7 @@ end
 
 post '/update-status' do
   build_number = params[:build_number]
+  build_results_url = params[:build_results_url]
   repo_name = params[:repo_name]
   sha = params[:sha]
   status = params[:status]
@@ -147,7 +148,7 @@ post '/update-status' do
     message = "Build \##{build_number} failed!"
   end
 
-  @github_client.create_status(repo_name, sha, status, {:description => message})
+  @github_client.create_status(repo_name, sha, status, {:description => message, :target_url => build_results_url})
 
   puts "Build \##{build_number} status updated"
 end
