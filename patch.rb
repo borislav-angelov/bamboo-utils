@@ -19,6 +19,11 @@ module Bamboo
           @http.post File.join(SERVICE, "queue/#{URI.escape key}"), {}, @http.cookies, query
         end
 
+        def latest_results
+          doc = @http.get File.join(SERVICE, "result/#{URI.escape key}/latest"), {}, @http.cookies
+          doc.auto_expand Result, @http
+        end
+
       end # Rest
     end # Plan
 
