@@ -56,7 +56,7 @@ get '/build-plan-status/:key' do |key|
     plan = @bamboo_client.plan_for(key)
     if plan.enabled?
 
-      # Get build status
+      # Get Build Status
       plan_results = plan.results
       if plan_results
         latest = plan_results.first
@@ -65,10 +65,13 @@ get '/build-plan-status/:key' do |key|
         else
           build_state_image = "images/failing.png"
         end
-
-        content_type "image/png"
-        return open(build_state_image, "rb") {|io| io.read }
+      else
+        build_state_image = "images/unknown.png"
       end
+
+      # Stream Build State Image
+      content_type "image/png"
+      return open(build_state_image, "rb") {|io| io.read }
 
     else
       "This plan is not enabled in Bamboo database"
