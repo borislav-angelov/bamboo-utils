@@ -58,8 +58,12 @@ get '/build-plan-status/:key' do |key|
 
       # Get build status
       plan_results = plan.results
+      if plan_results
+        latest = plan_results.first
 
-      puts plan_results.first
+        puts latest.inspect
+
+      end
 
     else
       "This plan is not enabled in Bamboo database"
