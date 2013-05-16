@@ -22,29 +22,29 @@ end
 
 post '/build-plan/:key' do |key|
   begin
-    plan = @bamboo_client.plan_for(key)
-    if plan.enabled?
+    # GitHub JSON Request
+    data = JSON.parse(request.body.read)
 
-      # GitHub JSON Request
-  		data = JSON.parse(request.body.read)
+    # Get Pull Request Parameters
+    pull_request = data['pull_request']
+    if pull_request and pull_request['head']
 
-      # Get Pull Request Parameters
-      pull_request = data['pull_request']
-      if pull_request and pull_request['head']
+      # Get default branch
+      default_branch = pull_request['head']['repo']['default_branch']
+      plan_key = "%s-%s" % [key, default_branch.upcase]
 
-        # Set Repository Full Name
-        repository_full_name = pull_request['head']['repo']['full_name']
-
+      plan = @bamboo_client.plan_for(plan_key)
+      if plan.enabled?
         # Trigger Build
         build_result = plan.queue({
-          :'bamboo.variable.repositoryFullName' => repository_full_name,
+          :'bamboo.variable.repositoryFullName' => pull_request['head']['repo']['full_name'],
           :'bamboo.variable.sha' => pull_request['head']['sha'],
         })
 
         puts "Build \##{build_result.data['buildNumber']} triggered"
+      else
+        "This plan is not enabled in Bamboo database"
       end
-    else
-      "This plan is not enabled in Bamboo database"
     end
   rescue RestClient::ResourceNotFound
   	"This plan does not exist in Bamboo database"
