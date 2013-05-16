@@ -33,6 +33,8 @@ post '/build-plan/:key' do |key|
       default_branch = pull_request['head']['repo']['default_branch']
       plan_key = "%s-%s" % [key, default_branch.upcase]
 
+      puts "Current plan key: #{plan_key}"
+
       plan = @bamboo_client.plan_for(plan_key)
       if plan.enabled?
         # Trigger Build
