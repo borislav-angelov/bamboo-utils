@@ -8,6 +8,9 @@ require './patch.rb'
 config_file 'config.yml'
 
 before do
+  # Redirect STDOUT to file
+  $stdout.sync = true
+
   # Bamboo Client
   begin
     @bamboo_client = Bamboo::Client.for(:rest, settings.bamboo['url'])
