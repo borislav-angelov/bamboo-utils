@@ -20,40 +20,78 @@ before do
   end
 
   # Github Client
-	@github_client = Octokit::Client.new(:login => settings.github['username'], :oauth_token => settings.github['token'])
+  @github_client = Octokit::Client.new(:login => settings.github['username'], :oauth_token => settings.github['token'])
 end
 
 post '/build-plan/:key' do |key|
-  begin
+
     # GitHub JSON Request
     data = JSON.parse(request.body.read)
 
-    # Get Pull Request Parameters
+    head_commit = data['head_commit']
     pull_request = data['pull_request']
-    if pull_request and pull_request['head']
 
-      # Get default branch
-      default_branch = pull_request['head']['repo']['default_branch']
-      plan_key = "%s-%s" % [key, default_branch.upcase]
+    if pull_request
 
-      puts "Current plan key: #{plan_key}"
+      # Define Plan Key
+      master_branch = 'test'
+      plan_key = "%s-%s" % [key, master_branch.upcase]
 
-      plan = @bamboo_client.plan_for(plan_key)
-      if plan.enabled?
-        # Trigger Build
-        build_result = plan.queue({
-          :'bamboo.variable.repositoryFullName' => pull_request['head']['repo']['full_name'],
-          :'bamboo.variable.sha' => pull_request['head']['sha'],
-        })
+      # Define Commit ID and Repository Full Name
+      commit_id = pull_request['head']['sha']
+      repository_full_name = pull_request['head']['repo']['full_name']
 
-        puts "Build \##{build_result.data['buildNumber']} triggered"
-      else
-        "This plan is not enabled in Bamboo database"
+      puts "Pull Request Plan Key: #{plan_key}"
+
+      begin
+        plan = @bamboo_client.plan_for(plan_key)
+        if plan.enabled?
+          # Trigger Build
+          build_result = plan.queue({
+            :'bamboo.variable.sha' => commit_id,
+            :'bamboo.variable.repositoryFullName' => repository_full_name,
+          })
+
+          puts "Build \##{build_result.data['buildNumber']} triggered"
+        else
+          "This plan is not enabled in Bamboo database"
+        end
+      rescue RestClient::ResourceNotFound
+        "This plan does not exist in Bamboo database"
       end
+
+    elsif head_commit
+
+      # Define Plan Key
+      master_branch = head_commit['repository']['master_branch']
+      plan_key = "%s-%s" % [key, master_branch.upcase]
+
+      # Define Repository Full Name and Commit ID
+      commit_id = head_commit['id']
+      organization = head_commit['repository']['organization']
+      repository_full_name = "%s/%s" % [organization, master_branch]
+
+      puts "Head Commit Plan Key: #{plan_key}"
+
+      begin
+        # Define Plan Key
+        plan = @bamboo_client.plan_for(plan_key)
+        if plan.enabled?
+          # Trigger Build
+          build_result = plan.queue({
+            :'bamboo.variable.sha' => commit_id,
+            :'bamboo.variable.repositoryFullName' => repository_full_name,
+          })
+
+          puts "Build \##{build_result.data['buildNumber']} triggered"
+        else
+          "This plan is not enabled in Bamboo database"
+        end
+      rescue RestClient::ResourceNotFound
+        "This plan does not exist in Bamboo database"
+      end
+
     end
-  rescue RestClient::ResourceNotFound
-  	"This plan does not exist in Bamboo database"
-  end
 end
 
 get '/build-plan-status/:key' do |key|
@@ -91,10 +129,10 @@ get '/manage-hooks' do
 
   if @repo_name
     begin
-  	  @hooks = @github_client.hooks(@repo_name)
+      @hooks = @github_client.hooks(@repo_name)
     rescue Octokit::NotFound
-  	  @message = "This repository is not found in GitHub (example: borislav-angelov/bamboo-pull-requests)"
-  	end
+      @message = "This repository is not found in GitHub (example: borislav-angelov/bamboo-pull-requests)"
+    end
   end
 
   erb :'manage-hooks'
@@ -107,14 +145,14 @@ post '/manage-hooks' do
   hook_id = params[:hook_id]
 
   if repo_name and hook_id
-  	@github_client.test_hook(repo_name, hook_id)
+    @github_client.test_hook(repo_name, hook_id)
 
     redirect '/manage-hooks?repo_name=' + repo_name
   elsif repo_name and hook_events and hook_url
-	  @github_client.create_hook(repo_name, 'web', {
+    @github_client.create_hook(repo_name, 'web', {
       :url => hook_url,
       :content_type => 'json'
-  	}, {
+    }, {
       :events => hook_events.split(','),
       :active => true
     })
@@ -126,14 +164,14 @@ post '/manage-hooks' do
 end
 
 delete '/manage-hooks' do
-	repo_name = params[:repo_name]
-	hook_id = params[:hook_id]
+  repo_name = params[:repo_name]
+  hook_id = params[:hook_id]
 
-	if repo_name and hook_id
-	  @github_client.remove_hook(repo_name, hook_id)
+  if repo_name and hook_id
+    @github_client.remove_hook(repo_name, hook_id)
 
-	  redirect '/manage-hooks?repo_name=' + repo_name
-	end
+    redirect '/manage-hooks?repo_name=' + repo_name
+  end
 end
 
 post '/update-status' do
