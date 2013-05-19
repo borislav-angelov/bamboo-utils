@@ -30,12 +30,11 @@ post '/build-plan/:key' do |key|
 
     head_commit = data['head_commit']
     pull_request = data['pull_request']
-    repository_data = data['repository']
 
     if pull_request
 
       # Define Plan Key
-      repo_branch = pull_request['head']['repo']['master_branch']
+      repo_branch = pull_request['head']['ref'].split('/').last
       plan_key = "%s-%s" % [key, 'TEST'] # Trigger Test Plan Build in Bamboo CI for Github pull requests
 
       # Define Repository Name And Head Commit
@@ -65,11 +64,11 @@ post '/build-plan/:key' do |key|
     elsif head_commit
 
       # Define Plan Key
-      repo_branch = repository_data['master_branch']
+      repo_branch = data['ref'].split('/').last
       plan_key = "%s-%s" % [key, repo_branch.upcase]
 
       # Define Repository Name And Head Commit
-      repo_name = "%s/%s" % [repository_data['organization'], repository_data['name']]
+      repo_name = "%s/%s" % [data['repository']['organization'], data['repository']['name']]
       repo_commit = head_commit['id']
 
       puts "Head Commit Plan Key: #{plan_key}"
