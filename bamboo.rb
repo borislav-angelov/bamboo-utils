@@ -194,6 +194,6 @@ post '/update-status' do
 
   @github_client.create_status(repo_name, repo_commit, status, {:description => message, :target_url => build_results_url})
 
-  puts "Build \##{build_number} status updated"
+  puts "Build \##{build_number} status updated: #{status}"
 end
 
