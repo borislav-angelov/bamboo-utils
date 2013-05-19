@@ -30,6 +30,7 @@ post '/build-plan/:key' do |key|
 
     head_commit = data['head_commit']
     pull_request = data['pull_request']
+    repository_data = data['repository']
 
     if pull_request
 
@@ -63,12 +64,12 @@ post '/build-plan/:key' do |key|
     elsif head_commit
 
       # Define Plan Key
-      master_branch = head_commit['repository']['master_branch']
+      master_branch = repository_data['master_branch']
       plan_key = "%s-%s" % [key, master_branch.upcase]
 
       # Define Repository Full Name and Commit ID
       commit_id = head_commit['id']
-      organization = head_commit['repository']['organization']
+      organization = repository_data['organization']
       repository_full_name = "%s/%s" % [organization, master_branch]
 
       puts "Head Commit Plan Key: #{plan_key}"
