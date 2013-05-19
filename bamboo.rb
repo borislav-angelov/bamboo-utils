@@ -49,9 +49,9 @@ post '/build-plan/:key' do |key|
         if plan.enabled?
           # Trigger Build
           build_result = plan.queue({
-            :'bamboo.variable.sha' => commit_id,
-            :'bamboo.variable.branch' => master_branch,
-            :'bamboo.variable.repositoryFullName' => repository_full_name,
+            :'bamboo.variable.repoName' => repository_full_name,
+            :'bamboo.variable.repoBranch' => master_branch,
+            :'bamboo.variable.repoCommit' => commit_id,
           })
 
           puts "Build \##{build_result.data['buildNumber']} triggered"
@@ -82,9 +82,9 @@ post '/build-plan/:key' do |key|
         if plan.enabled?
           # Trigger Build
           build_result = plan.queue({
-            :'bamboo.variable.sha' => commit_id,
-            :'bamboo.variable.branch' => master_branch,
-            :'bamboo.variable.repositoryFullName' => repository_full_name,
+            :'bamboo.variable.repoName' => repository_full_name,
+            :'bamboo.variable.repoBranch' => master_branch,
+            :'bamboo.variable.repoCommit' => commit_id,
           })
 
           puts "Build \##{build_result.data['buildNumber']} triggered"
