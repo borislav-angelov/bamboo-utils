@@ -35,8 +35,8 @@ post '/build-plan/:key' do |key|
     if pull_request
 
       # Define Plan Key
-      master_branch = 'test'
-      plan_key = "%s-%s" % [key, master_branch.upcase]
+      master_branch = pull_request['head']['repo']['master_branch']
+      plan_key = "%s-%s" % [key, 'TEST'] # Trigger Test Plan Build in Bamboo CI for Github pull requests
 
       # Define Commit ID and Repository Full Name
       commit_id = pull_request['head']['sha']
@@ -50,6 +50,7 @@ post '/build-plan/:key' do |key|
           # Trigger Build
           build_result = plan.queue({
             :'bamboo.variable.sha' => commit_id,
+            :'bamboo.variable.branch' => master_branch,
             :'bamboo.variable.repositoryFullName' => repository_full_name,
           })
 
@@ -70,7 +71,8 @@ post '/build-plan/:key' do |key|
       # Define Repository Full Name and Commit ID
       commit_id = head_commit['id']
       organization = repository_data['organization']
-      repository_full_name = "%s/%s" % [organization, master_branch]
+      repository_name = repository_data['name']
+      repository_full_name = "%s/%s" % [organization, repository_name]
 
       puts "Head Commit Plan Key: #{plan_key}"
 
@@ -81,6 +83,7 @@ post '/build-plan/:key' do |key|
           # Trigger Build
           build_result = plan.queue({
             :'bamboo.variable.sha' => commit_id,
+            :'bamboo.variable.branch' => master_branch,
             :'bamboo.variable.repositoryFullName' => repository_full_name,
           })
 
