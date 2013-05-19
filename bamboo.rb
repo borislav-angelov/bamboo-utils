@@ -35,12 +35,12 @@ post '/build-plan/:key' do |key|
     if pull_request
 
       # Define Plan Key
-      master_branch = pull_request['head']['repo']['master_branch']
+      repo_branch = pull_request['head']['repo']['master_branch']
       plan_key = "%s-%s" % [key, 'TEST'] # Trigger Test Plan Build in Bamboo CI for Github pull requests
 
-      # Define Commit ID and Repository Full Name
-      commit_id = pull_request['head']['sha']
-      repository_full_name = pull_request['head']['repo']['full_name']
+      # Define Repository Name And Head Commit
+      repo_name = pull_request['head']['repo']['full_name']
+      repo_commit = pull_request['head']['sha']
 
       puts "Pull Request Plan Key: #{plan_key}"
 
@@ -49,9 +49,9 @@ post '/build-plan/:key' do |key|
         if plan.enabled?
           # Trigger Build
           build_result = plan.queue({
-            :'bamboo.variable.repoName' => repository_full_name,
-            :'bamboo.variable.repoBranch' => master_branch,
-            :'bamboo.variable.repoCommit' => commit_id,
+            :'bamboo.variable.repoName' => repo_name,
+            :'bamboo.variable.repoBranch' => repo_branch,
+            :'bamboo.variable.repoCommit' => repo_commit,
           })
 
           puts "Build \##{build_result.data['buildNumber']} triggered"
@@ -65,14 +65,12 @@ post '/build-plan/:key' do |key|
     elsif head_commit
 
       # Define Plan Key
-      master_branch = repository_data['master_branch']
-      plan_key = "%s-%s" % [key, master_branch.upcase]
+      repo_branch = repository_data['master_branch']
+      plan_key = "%s-%s" % [key, repo_branch.upcase]
 
-      # Define Repository Full Name and Commit ID
-      commit_id = head_commit['id']
-      organization = repository_data['organization']
-      repository_name = repository_data['name']
-      repository_full_name = "%s/%s" % [organization, repository_name]
+      # Define Repository Name And Head Commit
+      repo_name = "%s/%s" % [repository_data['organization'], repository_data['name']]
+      repo_commit = head_commit['id']
 
       puts "Head Commit Plan Key: #{plan_key}"
 
@@ -82,9 +80,9 @@ post '/build-plan/:key' do |key|
         if plan.enabled?
           # Trigger Build
           build_result = plan.queue({
-            :'bamboo.variable.repoName' => repository_full_name,
-            :'bamboo.variable.repoBranch' => master_branch,
-            :'bamboo.variable.repoCommit' => commit_id,
+            :'bamboo.variable.repoName' => repo_name,
+            :'bamboo.variable.repoBranch' => repo_branch,
+            :'bamboo.variable.repoCommit' => repo_commit,
           })
 
           puts "Build \##{build_result.data['buildNumber']} triggered"
@@ -182,7 +180,7 @@ post '/update-status' do
   build_number = params[:build_number]
   build_results_url = params[:build_results_url]
   repo_name = params[:repo_name]
-  sha = params[:sha]
+  repo_commit = params[:repo_commit]
   status = params[:status]
 
   # Update Status
@@ -195,7 +193,7 @@ post '/update-status' do
     message = "Build \##{build_number} failed!"
   end
 
-  @github_client.create_status(repo_name, sha, status, {:description => message, :target_url => build_results_url})
+  @github_client.create_status(repo_name, repo_commit, status, {:description => message, :target_url => build_results_url})
 
   puts "Build \##{build_number} status updated"
 end
