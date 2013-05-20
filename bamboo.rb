@@ -33,13 +33,10 @@ post '/build-plan/:key' do |key|
 
     if pull_request
 
-      # Define Plan Key
+      # Set repository parameters
+      repo_name = pull_request['head']['repo']['full_name']
       repo_branch = pull_request['head']['ref']
       plan_key = "%s-%s" % [key, 'TEST'] # Trigger Test Plan Build in Bamboo CI for Github pull requests
-
-      # Define Repository Name And Head Commit
-      repo_name = pull_request['head']['repo']['full_name']
-      repo_commit = pull_request['head']['sha']
 
       puts "Pull Request Plan Key: #{plan_key}"
 
@@ -50,7 +47,6 @@ post '/build-plan/:key' do |key|
           build_result = plan.queue({
             :'bamboo.variable.repoName' => repo_name,
             :'bamboo.variable.repoBranch' => repo_branch,
-            :'bamboo.variable.repoCommit' => repo_commit,
           })
 
           puts "Build \##{build_result.data['buildNumber']} triggered"
@@ -63,13 +59,10 @@ post '/build-plan/:key' do |key|
 
     elsif head_commit
 
-      # Define Plan Key
+      # Set repository parameters
+      repo_name = "%s/%s" % [data['repository']['organization'], data['repository']['name']]
       repo_branch = data['ref'].split('/').last
       plan_key = "%s-%s" % [key, repo_branch.upcase]
-
-      # Define Repository Name And Head Commit
-      repo_name = "%s/%s" % [data['repository']['organization'], data['repository']['name']]
-      repo_commit = head_commit['id']
 
       puts "Head Commit Plan Key: #{plan_key}"
 
@@ -81,7 +74,6 @@ post '/build-plan/:key' do |key|
           build_result = plan.queue({
             :'bamboo.variable.repoName' => repo_name,
             :'bamboo.variable.repoBranch' => repo_branch,
-            :'bamboo.variable.repoCommit' => repo_commit,
           })
 
           puts "Build \##{build_result.data['buildNumber']} triggered"
@@ -116,21 +108,6 @@ get '/build-plan-status/:key' do |key|
       # Stream Build State Image
       content_type "image/png"
       return open(build_state_image, "rb") {|io| io.read }
-
-    else
-      "This plan is not enabled in Bamboo database"
-    end
-  rescue RestClient::ResourceNotFound
-    "This plan does not exist in Bamboo database"
-  end
-end
-
-get '/build-plan-latest-commit/:key' do |key|
-  begin
-    plan = @bamboo_client.plan_for(key)
-    if plan.enabled?
-
-      puts plan.inspect
 
     else
       "This plan is not enabled in Bamboo database"
@@ -194,7 +171,7 @@ post '/update-status' do
   build_number = params[:build_number]
   build_results_url = params[:build_results_url]
   repo_name = params[:repo_name]
-  repo_commit = params[:repo_commit]
+  repo_revision = params[:repo_revision]
   status = params[:status]
 
   # Update Status
@@ -207,9 +184,24 @@ post '/update-status' do
     message = "Build \##{build_number} failed!"
   end
 
-  @github_client.create_status(repo_name, repo_commit, status, {:description => message, :target_url => build_results_url})
+  @github_client.create_status(repo_name, repo_revision, status, {:description => message, :target_url => build_results_url})
 
-  puts "Build \##{build_number} status updated: #{status}"
+  puts "Build \##{build_number} status updated: #{status} at revision: #{repo_revision}"
+end
+
+get '/latest-commit/:key' do |key|
+  begin
+    plan = @bamboo_client.plan_for(key)
+    if plan.enabled?
+
+      puts plan.inspect
+
+    else
+      "This plan is not enabled in Bamboo database"
+    end
+  rescue RestClient::ResourceNotFound
+    "This plan does not exist in Bamboo database"
+  end
 end
 
 
