@@ -13,6 +13,11 @@ module Bamboo
     end # Http
 
     class Rest < Abstract
+
+      def plan_for(key, query = nil)
+        Plan.new get("plan/#{URI.escape key}", query).data, @http
+      end
+
       class Plan
 
         def queue(query = nil)
