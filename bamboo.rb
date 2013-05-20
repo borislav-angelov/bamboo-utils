@@ -184,9 +184,13 @@ post '/update-status' do
     message = "Build \##{build_number} failed!"
   end
 
-  @github_client.create_status(repo_name, repo_revision, status, {:description => message, :target_url => build_results_url})
+  begin
+    @github_client.create_status(repo_name, repo_revision, status, {:description => message, :target_url => build_results_url})
 
-  puts "Build \##{build_number} status updated: #{status} at revision: #{repo_revision}"
+    puts "Build \##{build_number} status updated: #{status} in repository: #{repo_name} at revision: #{repo_revision}"
+  rescue Octokit::NotFound
+    puts "Status: #{status} not found in repository: #{repo_name} at revision: #{repo_revision}"
+  end
 end
 
 get '/latest-commit/:key' do |key|
