@@ -34,7 +34,7 @@ post '/build-plan/:key' do |key|
     if pull_request
 
       # Define Plan Key
-      repo_branch = pull_request['head']['ref'].split('/').last
+      repo_branch = pull_request['head']['ref']
       plan_key = "%s-%s" % [key, 'TEST'] # Trigger Test Plan Build in Bamboo CI for Github pull requests
 
       # Define Repository Name And Head Commit
@@ -125,6 +125,21 @@ get '/build-plan-status/:key' do |key|
   end
 end
 
+get '/build-plan-latest-commit/:key' do |key|
+  begin
+    plan = @bamboo_client.plan_for(key)
+    if plan.enabled?
+
+      puts plan.inspect
+
+    else
+      "This plan is not enabled in Bamboo database"
+    end
+  rescue RestClient::ResourceNotFound
+    "This plan does not exist in Bamboo database"
+  end
+end
+
 get '/manage-hooks' do
   @repo_name = params[:repo_name]
 
@@ -196,4 +211,5 @@ post '/update-status' do
 
   puts "Build \##{build_number} status updated: #{status}"
 end
+
 
