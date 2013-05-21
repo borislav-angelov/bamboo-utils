@@ -87,7 +87,7 @@ post '/build-plan/:key' do |key|
       end
 
     else
-      "Github empty parameters for pull_request or head_commit"
+      puts "Github empty parameters for pull_request or head_commit"
     end
 end
 
