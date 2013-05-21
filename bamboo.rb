@@ -193,15 +193,15 @@ post '/update-status' do
   end
 end
 
-get '/latest-commit/:key' do |key|
+get '/latest-revision/:key' do |key|
   begin
     plan = @bamboo_client.plan_for(key)
     if plan.enabled?
 
       results = plan.latest_results
+      revison = results.data['vcsRevisionKey']
 
-      puts results.data['vcsRevisionKey']
-
+      "Revision: #{revison}"
     else
       "This plan is not enabled in Bamboo database"
     end
