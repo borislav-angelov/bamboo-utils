@@ -14,11 +14,12 @@ module Bamboo
 
     class Rest < Abstract
 
-      def plan_for(key, query = nil)
-        Plan.new get("plan/#{URI.escape key}", query).data, @http
-      end
-
       class Plan
+
+        def latest_results
+          doc = @http.get File.join(SERVICE, "result/#{URI.escape key}/latest"), {}, @http.cookies
+          doc.auto_expand Result, @http
+        end
 
         def queue(query = nil)
           @http.post File.join(SERVICE, "queue/#{URI.escape key}"), {}, @http.cookies, query

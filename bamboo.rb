@@ -195,10 +195,10 @@ end
 
 get '/latest-commit/:key' do |key|
   begin
-    plan = @bamboo_client.plan_for(key, {:expand => 'variableContext'})
+    plan = @bamboo_client.plan_for(key)
     if plan.enabled?
 
-      puts plan.inspect
+      puts plan.latest_results.inspect
 
     else
       "This plan is not enabled in Bamboo database"
