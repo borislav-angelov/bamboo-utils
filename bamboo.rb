@@ -198,7 +198,9 @@ get '/latest-commit/:key' do |key|
     plan = @bamboo_client.plan_for(key)
     if plan.enabled?
 
-      puts plan.latest_results.inspect
+      results = plan.latest_results
+
+      puts results.data['vcsRevisionKey']
 
     else
       "This plan is not enabled in Bamboo database"
