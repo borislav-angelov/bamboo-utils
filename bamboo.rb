@@ -28,6 +28,8 @@ post '/build-plan/:key' do |key|
     # GitHub JSON Request
     data = JSON.parse(request.body.read)
 
+    puts data
+
     head_commit = data['head_commit']
     pull_request = data['pull_request']
 
@@ -84,6 +86,8 @@ post '/build-plan/:key' do |key|
         "This plan does not exist in Bamboo database"
       end
 
+    else
+      "Github empty parameters for pull_request or head_commit"
     end
 end
 
